@@ -15,3 +15,6 @@ https://www.youtube.com/watch?v=ExQDiLaTzBA
 
 https://milkywaymike.com/
 
+
+mogrify vs convert
+https://www.smashingmagazine.com/2015/06/efficient-image-resizing-with-imagemagick/
