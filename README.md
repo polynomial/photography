@@ -59,3 +59,27 @@ Open Issues:
 
 . lots of online research seems to indicate that RAW/CR2 images are better for night photography, these don't work well with the tools in these scripts and are huge
 . figure out how to get it to over-expose at night but not the next morning for stars and sunrise
+
+Research:
+
+. https://en.wikipedia.org/wiki/Sunny_16_rule
+.. iso 100 5/16 1/100 1/125
+.. 200 f/16 200 250
+.. 400 16 400 500
+.. vary aperture to meter
+. https://en.wikipedia.org/wiki/Looney_11_rule
+.. iso 100 f/11 1/100 or 1/125
+.. 200 11 200 250
+.. 400 11 400 500
+.. vary aperture to meter
+. http://www.outdoorphotoacademy.com/slow-shutter-speed/
+.. 10mm = 1/10th/s
+.. 200mm = 1/200th/s
+. http://www.outdoorphotoacademy.com/turn-off-image-stabilization-using-tripod/
+.. turn off IS on a tripod
+. https://www.lightstalking.com/how-to-photograph-the-moon/
+. https://www.lightstalking.com/how-to-focus-in-low-light/
+. https://photographylife.com/landscapes/how-to-photograph-moon
+. https://digital-photography-school.com/how-to-find-and-use-hyperfocal-distance-for-sharp-backgrounds/
+. http://www.outdoorphotoacademy.com/applying-focus-techniques/
+. http://www.outdoorphotoacademy.com/example-water-super-fast-shutter-speed/
