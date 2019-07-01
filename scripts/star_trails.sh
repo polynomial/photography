@@ -1,9 +1,29 @@
 #!/usr/bin/env bash
-#echo="echo"
+echo="echo"
 umask 000
 echo=""
 set -x
-prefix="night_auto_iso"
+
+function wait_for_load() {
+  jobcount=$(jobs |grep -c .)
+  if [ $jobcount -gt 40 ] ; then
+    sleep 70
+  fi
+  jobcount=$(jobs |grep -c .)
+  if [ $jobcount -gt 32 ] ; then
+    sleep 30
+  fi
+  jobcount=$(jobs |grep -c .)
+  if [ $jobcount -gt 32 ] ; then
+    sleep 8
+  fi
+  jobcount=$(jobs |grep -c .)
+  if [ $jobcount -gt 24 ] ; then
+    sleep 1
+  fi
+}
+
+prefix="combined_$(date +%s)"
 for b in `seq 0 9`; do
   for n in `seq 0 9`; do
     for y in `seq 0 9`; do
@@ -20,34 +40,62 @@ for b in `seq 0 9`; do
   done
 done
 $echo cp $(\ls IMG_* | head -1) ${prefix}.jpg
-for i in ${prefix}_*; do
-  $echo convert ${prefix}.jpg $i -gravity center -compose lighten -composite -format jpg ${prefix}.jpg
+prefix=combined_1561919786
+(
+  for i in ${prefix}_*; do
+    $echo convert ${prefix}.jpg $i -gravity center -compose lighten -composite -format jpg ${prefix}.jpg
+  done
+  mv ${prefix}.jpg all_${prefix}.jpg
+) &
+number_to_generate=40
+number_to_random=20
+source_prefix=${prefix}
+for n in `seq 0 ${number_to_generate}`; do 
+  ( 
+    cp $(ls ${source_prefix}_* | random ${number_to_random} | head -1) random_${n}_${source_prefix}.jpg
+    for i in $(ls ${source_prefix}_* | random ${number_to_random}); do
+      echo -n .
+      $echo convert random_${n}_${source_prefix}.jpg $i -gravity center -compose lighten -composite -format jpg random_${n}_${source_prefix}.jpg
+    done
+  ) &
+  wait_for_load
 done
-wait
-tprefix=trail_night
-source_prefix=night_auto_iso
+tprefix="trail_$(date +%s)"
+source_prefix="${prefix}"
 count=$(\ls -1 ${source_prefix}_* | grep -c .)
+length=10
 for i in `seq 0 ${count}`; do
   file=$(seq -w $i ${count} | head -1)
   echo $i
   (
-    $echo cp $(ls ${source_prefix}_* | head -$((10 + $i)) | tail -10 | head -1) ${tprefix}_${file}.jpg
-    for img in $(ls ${source_prefix}_* | head -$((10 + $i)) | tail -10); do
+    $echo cp $(ls ${source_prefix}_* | head -$(($length + $i)) | tail -$length | head -1) ${tprefix}_${file}.jpg
+    for img in $(ls ${source_prefix}_* | head -$(($length + $i)) | tail -$length); do
       $echo convert ${tprefix}_${file}.jpg $img -gravity center -compose lighten -composite -format jpg ${tprefix}_${file}.jpg
     done
   ) &
-  jobcount=$(jobs |grep -c .)
-  if [ $jobcount -gt 24 ] ; then
-    wait
-  fi
+  wait_for_load
 done
+wait
+number_to_generate=20
+number_to_random=10
+source_prefix=${tprefix}
+for n in `seq 0 ${number_to_generate}`; do 
+  ( 
+    cp $(ls ${source_prefix}_* | random ${number_to_random} | head -1) random_${n}_${source_prefix}.jpg
+    for i in $(ls ${source_prefix}_* | random ${number_to_random}); do
+      echo -n .
+      $echo convert random_${n}_${source_prefix}.jpg $i -gravity center -compose lighten -composite -format jpg random_${n}_${source_prefix}.jpg
+    done
+  ) &
+  wait_for_load
+done
+wait
 $echo mencoder "mf://${tprefix}_*" -o ${tprefix}.avi -ovc lavc -lavcopts vcodec=mjpeg &
 $echo mencoder "mf://${tprefix}_*" -o ${tprefix}.mpg -ovc copy -oac copy &
-$echo mencoder "mf://IMG_*.JPG" -o IMG.avi -ovc lavc -lavcopts vcodec=mjpeg &
-$echo mencoder "mf://IMG_*.JPG" -o IMG.mpg -ovc copy -oac copy &
+$echo mencoder "mf://IMG_*.JPG" -o IMG_${prefix}.avi -ovc lavc -lavcopts vcodec=mjpeg &
+$echo mencoder "mf://IMG_*.JPG" -o IMG_${prefix}.mpg -ovc copy -oac copy &
 $echo mencoder "mf://${prefix}_*" -o ${prefix}.avi -ovc lavc -lavcopts vcodec=mjpeg &
 $echo mencoder "mf://${prefix}_*" -o ${prefix}.mpg -ovc copy -oac copy &
-
 wait
 echo "done:"
 ls -l ${prefix}_*.jpg -l ${prefix}.* ${tprefix}.*

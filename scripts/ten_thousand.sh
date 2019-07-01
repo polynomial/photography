@@ -4,8 +4,6 @@ umask 000
 echo=""
 set -x
 prefix="night_auto_iso"
-$echo mencoder "mf://IMG_*.JPG" -o IMG.avi -ovc lavc -lavcopts vcodec=mjpeg &
-$echo mencoder "mf://IMG_*.JPG" -o IMG.mpg -ovc copy -oac copy &
 for b in `seq 0 9`; do
   for n in `seq 0 9`; do
     for y in `seq 0 9`; do
@@ -22,8 +20,6 @@ for b in `seq 0 9`; do
     done
   done
 done
-$echo mencoder "mf://${prefix}_*" -o ${prefix}.avi -ovc lavc -lavcopts vcodec=mjpeg &
-$echo mencoder "mf://${prefix}_*" -o ${prefix}.mpg -ovc copy -oac copy &
 $echo cp $(\ls IMG_* | head -1) ${prefix}.jpg
 for i in ${prefix}_*; do
   $echo convert ${prefix}.jpg $i -gravity center -compose lighten -composite -format jpg ${prefix}.jpg
@@ -46,6 +42,10 @@ for i in `seq 0 ${count}`; do
   fi
 done
 wait
+$echo mencoder "mf://IMG_*.JPG" -o IMG.avi -ovc lavc -lavcopts vcodec=mjpeg &
+$echo mencoder "mf://IMG_*.JPG" -o IMG.mpg -ovc copy -oac copy &
+$echo mencoder "mf://${prefix}_*" -o ${prefix}.avi -ovc lavc -lavcopts vcodec=mjpeg &
+$echo mencoder "mf://${prefix}_*" -o ${prefix}.mpg -ovc copy -oac copy &
 $echo mencoder "mf://${tprefix}_*" -o ${tprefix}.avi -ovc lavc -lavcopts vcodec=mjpeg &
 $echo mencoder "mf://${tprefix}_*" -o ${tprefix}.mpg -ovc copy -oac copy &
 

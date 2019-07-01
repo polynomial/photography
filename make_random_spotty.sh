@@ -1,0 +1,1 @@
+for n in `seq 0 20`; do prefix="$1"; cp $(ls ${prefix}_* | random 20 | head -1) ${prefix}.jpg; for i in $(ls ${prefix}_* | random 30); do echo -n .;  $echo convert ${prefix}.jpg $i -gravity center -compose lighten -composite -format jpg ${prefix}.jpg; done; mv -v ${prefix}.jpg random_${n}_${prefix}.jpg; done
