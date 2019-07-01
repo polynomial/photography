@@ -47,6 +47,14 @@ I let it take images overnight and then the next morning download them into a di
 . checkout all_combined* for total star trail output
 . if desired pair down the combined_* images to have fewer images based on the desire trail output
 
+Output Artifacts:
+
+. all_combined_: a combination of all the IMG_ images with the brightest pixels from each
+. combined_: takes ten IMG_ images and makes them into one image with the brightest pixels from each
+. trail_: same as above but uses the 'trailing' ten images to create moving trails in the trail_ movies
+. random_: takes random images from combined and trail to produce interesting morse code star trails
+. movies/: creates animations from serializing each image into a movie
+
 Open Issues:
 
 . lots of online research seems to indicate that RAW/CR2 images are better for night photography, these don't work well with the tools in these scripts and are huge
