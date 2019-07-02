@@ -40,7 +40,6 @@ for b in `seq 0 9`; do
   done
 done
 $echo cp $(\ls IMG_* | head -1) ${prefix}.jpg
-prefix=combined_1561919786
 (
   for i in ${prefix}_*; do
     $echo convert ${prefix}.jpg $i -gravity center -compose lighten -composite -format jpg ${prefix}.jpg
