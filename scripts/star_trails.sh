@@ -39,7 +39,7 @@ for b in `seq 0 9`; do
     wait
   done
 done
-$echo cp $(\ls IMG_* | head -1) ${prefix}.jpg
+$echo cp $(\ls ${prefix}_* | head -1) ${prefix}.jpg
 (
   for i in ${prefix}_*; do
     $echo convert ${prefix}.jpg $i -gravity center -compose lighten -composite -format jpg ${prefix}.jpg
