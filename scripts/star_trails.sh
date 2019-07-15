@@ -92,7 +92,7 @@ wait
 $echo mencoder "mf://${tprefix}_*" -o ${tprefix}.avi -ovc lavc -lavcopts vcodec=mjpeg &
 $echo mencoder "mf://${tprefix}_*" -o ${tprefix}.mpg -ovc copy -oac copy &
 $echo mencoder "mf://IMG_*.JPG" -o IMG_${prefix}.avi -ovc lavc -lavcopts vcodec=mjpeg &
-$echo mencoder "mf://IMG_*.JPG" -o IMG_${prefix}.mpg -ovc copy -oac copy &
+#$echo mencoder "mf://IMG_*.JPG" -o IMG_${prefix}.mpg -ovc copy -oac copy &
 $echo mencoder "mf://${prefix}_*" -o ${prefix}.avi -ovc lavc -lavcopts vcodec=mjpeg &
 $echo mencoder "mf://${prefix}_*" -o ${prefix}.mpg -ovc copy -oac copy &
 wait
