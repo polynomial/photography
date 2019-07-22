@@ -32,8 +32,8 @@ $echo cp $(\ls ${prefix}_* | head -1) ${prefix}.jpg
   done
   mv ${prefix}.jpg all_${prefix}.jpg
 ) &
-number_to_generate=40
-number_to_random=20
+number_to_generate=$2
+number_to_random=$3
 source_prefix=${prefix}
 for n in `seq 0 ${number_to_generate}`; do 
   ( 
