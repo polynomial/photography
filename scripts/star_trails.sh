@@ -96,6 +96,9 @@ $echo mencoder "mf://IMG_*.JPG" -o IMG_${prefix}.avi -ovc lavc -lavcopts vcodec=
 $echo mencoder "mf://${prefix}_*" -o ${prefix}.avi -ovc lavc -lavcopts vcodec=mjpeg &
 $echo mencoder "mf://${prefix}_*" -o ${prefix}.mpg -ovc copy -oac copy &
 #ffmpeg -i combined_1566777546.mpg -c:v libx264 -c:a libfaac -crf 20 -preset:v veryslow combined_1566777546.mp4
+# starting at IMG_1426
+# crf is the outstanding thing now 
+#ffmpeg -start_number 1426 -i IMG_%04d.JPG -c:v libx264 -crf 10-25? -preset:v veryslow IMG-test.mp4
 
 wait
 echo "done:"
