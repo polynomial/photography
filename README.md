@@ -7,47 +7,42 @@ Tools:
 * Hugin
 
 References:
-
-https://patdavid.net/2013/01/focus-stacking-macro-photos-enfuse.html
-https://patdavid.net/2013/05/noise-removal-in-photos-with-median_6.html
-https://www.youtube.com/watch?v=81krjG0_S2I
-https://www.youtube.com/watch?v=ExQDiLaTzBA
-
-https://milkywaymike.com/
-
-
-mogrify vs convert
-https://www.smashingmagazine.com/2015/06/efficient-image-resizing-with-imagemagick/
+* https://patdavid.net/2013/01/focus-stacking-macro-photos-enfuse.html
+* https://patdavid.net/2013/05/noise-removal-in-photos-with-median_6.html
+* https://www.youtube.com/watch?v=81krjG0_S2I
+* https://www.youtube.com/watch?v=ExQDiLaTzBA
+* https://milkywaymike.com/
+* mogrify vs convert https://www.smashingmagazine.com/2015/06/efficient-image-resizing-with-imagemagick/
 
 
 Workflow:
 
 I use either a remote shutter control, or I use Av mode on a Canon 80D camera.
 My lenses:
-. 8mm Altura f/3.0
-. 10-22mm Canon EF-S f/3.5 
+* 8mm Altura f/3.0
+* 10-22mm Canon EF-S f/3.5 
 
 The settings that matter most:
-. Av Mode
-. manual focus, use Live View to pixel peep and verify Hyperfocal length setting and then switch to MF
-. spot metering (depending on the setting, i frequently have city lights in the frame and they can darken it otherwise)
-. over expose by 2-3 stops
-. auto iso 100-400 or sometimes 800
-. JPG-L output only
+* Av Mode
+* manual focus, use Live View to pixel peep and verify Hyperfocal length setting and then switch to MF
+* spot metering (depending on the setting, i frequently have city lights in the frame and they can darken it otherwise)
+* over expose by 2-3 stops
+* auto iso 100-400 or sometimes 800
+* JPG-L output only
 
 I let it take images overnight and then the next morning download them into a directory and use:
-. check for washed out images, usually after dawn it starts to wash out due to direct sun, I delete these
-. remove any images where the cloud cover is too much/foggy
-. check for blurry images due to fog/rain
-. look at first few images to make sure any test images aren't in the batch
-. run star_trails.sh
-. checkout all_combined* for total star trail output
-. if desired pair down the combined_* images to have fewer images based on the desire trail output
+* check for washed out images, usually after dawn it starts to wash out due to direct sun, I delete these
+* remove any images where the cloud cover is too much/foggy
+* check for blurry images due to fog/rain
+* look at first few images to make sure any test images aren't in the batch
+* run star_trails.sh
+* checkout all_combined* for total star trail output
+* if desired pair down the combined_* images to have fewer images based on the desire trail output
 
 Output Artifacts:
-. all_combined_: a combination of all the IMG_ images with the brightest pixels from each
-. combined_: takes ten IMG_ images and makes them into one image with the brightest pixels from each
-. trail_: same as above but uses the 'trailing' ten images to create moving trails in the trail_ movies
+* all_combined_: a combination of all the IMG_ images with the brightest pixels from each
+* combined_: takes ten IMG_ images and makes them into one image with the brightest pixels from each
+* trail_: same as above but uses the 'trailing' ten images to create moving trails in the trail_ movies
 . random_: takes random images from combined and trail to produce interesting morse code star trails
 . movies/: creates animations from serializing each image into a movie
 
