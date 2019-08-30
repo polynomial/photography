@@ -57,15 +57,15 @@ Research:
   * 400 16 400 500
   * vary aperture to meter
 * https://en.wikipedia.org/wiki/Looney_11_rule
-** iso 100 f/11 1/100 or 1/125
-** 200 11 200 250
-** 400 11 400 500
-** vary aperture to meter
+ * iso 100 f/11 1/100 or 1/125
+ * 200 11 200 250
+ * 400 11 400 500
+ * vary aperture to meter
 * http://www.outdoorphotoacademy.com/slow-shutter-speed/
-** 10mm = 1/10th/s
-** 200mm = 1/200th/s
+ * 10mm = 1/10th/s
+ * 200mm = 1/200th/s
 * http://www.outdoorphotoacademy.com/turn-off-image-stabilization-using-tripod/
-** turn off IS on a tripod
+ * turn off IS on a tripod
 * https://www.lightstalking.com/how-to-photograph-the-moon/
 * https://www.lightstalking.com/how-to-focus-in-low-light/
 * https://photographylife.com/landscapes/how-to-photograph-moon
