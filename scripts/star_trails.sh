@@ -6,19 +6,19 @@ set -x
 
 function wait_for_load() {
   jobcount=$(jobs |grep -c .)
-  if [ $jobcount -gt 40 ] ; then
+  if [ $jobcount -gt 32 ] ; then
     sleep 70
   fi
   jobcount=$(jobs |grep -c .)
-  if [ $jobcount -gt 32 ] ; then
+  if [ $jobcount -gt 16 ] ; then
     sleep 30
   fi
   jobcount=$(jobs |grep -c .)
-  if [ $jobcount -gt 32 ] ; then
+  if [ $jobcount -gt 12 ] ; then
     sleep 8
   fi
   jobcount=$(jobs |grep -c .)
-  if [ $jobcount -gt 24 ] ; then
+  if [ $jobcount -gt 8 ] ; then
     sleep 1
   fi
 }
@@ -51,8 +51,8 @@ number_to_random=20
 source_prefix=${prefix}
 for n in `seq 0 ${number_to_generate}`; do 
   ( 
-    cp $(ls ${source_prefix}_* | random ${number_to_random} | head -1) random_${n}_${source_prefix}.jpg
-    for i in $(ls ${source_prefix}_* | random ${number_to_random}); do
+    cp $(\ls ${source_prefix}_* | random ${number_to_random} | head -1) random_${n}_${source_prefix}.jpg
+    for i in $(\ls ${source_prefix}_* | random ${number_to_random}); do
       echo -n .
       $echo convert random_${n}_${source_prefix}.jpg $i -gravity center -compose lighten -composite -format jpg random_${n}_${source_prefix}.jpg
     done
@@ -67,8 +67,8 @@ for i in `seq 0 ${count}`; do
   file=$(seq -w $i ${count} | head -1)
   echo $i
   (
-    $echo cp $(ls ${source_prefix}_* | head -$(($length + $i)) | tail -$length | head -1) ${tprefix}_${file}.jpg
-    for img in $(ls ${source_prefix}_* | head -$(($length + $i)) | tail -$length); do
+    $echo cp $(\ls ${source_prefix}_* | head -$(($length + $i)) | tail -$length | head -1) ${tprefix}_${file}.jpg
+    for img in $(\ls ${source_prefix}_* | head -$(($length + $i)) | tail -$length); do
       $echo convert ${tprefix}_${file}.jpg $img -gravity center -compose lighten -composite -format jpg ${tprefix}_${file}.jpg
     done
   ) &
@@ -80,8 +80,8 @@ number_to_random=10
 source_prefix=${tprefix}
 for n in `seq 0 ${number_to_generate}`; do 
   ( 
-    cp $(ls ${source_prefix}_* | random ${number_to_random} | head -1) random_${n}_${source_prefix}.jpg
-    for i in $(ls ${source_prefix}_* | random ${number_to_random}); do
+    cp $(\ls ${source_prefix}_* | random ${number_to_random} | head -1) random_${n}_${source_prefix}.jpg
+    for i in $(\ls ${source_prefix}_* | random ${number_to_random}); do
       echo -n .
       $echo convert random_${n}_${source_prefix}.jpg $i -gravity center -compose lighten -composite -format jpg random_${n}_${source_prefix}.jpg
     done
