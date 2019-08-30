@@ -24,12 +24,10 @@ Workflow:
 
 I use either a remote shutter control, or I use Av mode on a Canon 80D camera.
 My lenses:
-
 . 8mm Altura f/3.0
 . 10-22mm Canon EF-S f/3.5 
 
 The settings that matter most:
-
 . Av Mode
 . manual focus, use Live View to pixel peep and verify Hyperfocal length setting and then switch to MF
 . spot metering (depending on the setting, i frequently have city lights in the frame and they can darken it otherwise)
@@ -38,7 +36,6 @@ The settings that matter most:
 . JPG-L output only
 
 I let it take images overnight and then the next morning download them into a directory and use:
-
 . check for washed out images, usually after dawn it starts to wash out due to direct sun, I delete these
 . remove any images where the cloud cover is too much/foggy
 . check for blurry images due to fog/rain
@@ -48,7 +45,6 @@ I let it take images overnight and then the next morning download them into a di
 . if desired pair down the combined_* images to have fewer images based on the desire trail output
 
 Output Artifacts:
-
 . all_combined_: a combination of all the IMG_ images with the brightest pixels from each
 . combined_: takes ten IMG_ images and makes them into one image with the brightest pixels from each
 . trail_: same as above but uses the 'trailing' ten images to create moving trails in the trail_ movies
@@ -56,12 +52,10 @@ Output Artifacts:
 . movies/: creates animations from serializing each image into a movie
 
 Open Issues:
-
 . lots of online research seems to indicate that RAW/CR2 images are better for night photography, these don't work well with the tools in these scripts and are huge
 . figure out how to get it to over-expose at night but not the next morning for stars and sunrise
 
 Research:
-
 . https://en.wikipedia.org/wiki/Sunny_16_rule
 .. iso 100 5/16 1/100 1/125
 .. 200 f/16 200 250
