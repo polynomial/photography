@@ -52,10 +52,10 @@ Open Issues:
 
 Research:
 * https://en.wikipedia.org/wiki/Sunny_16_rule
-** iso 100 5/16 1/100 1/125
-** 200 f/16 200 250
-** 400 16 400 500
-** vary aperture to meter
+  * iso 100 5/16 1/100 1/125
+  * 200 f/16 200 250
+  * 400 16 400 500
+  * vary aperture to meter
 * https://en.wikipedia.org/wiki/Looney_11_rule
 ** iso 100 f/11 1/100 or 1/125
 ** 200 11 200 250
