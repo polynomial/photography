@@ -20,4 +20,14 @@ CPUS for 6x are 400
 cpus for 4x are 200/250 for a .2ghz boost
 
 
+options for sensors
+5dsr is 140$/day from samys
+has 50 mp sensor
+doesn't put shutter load on my bodies
+
+lenses
+?
+
+
+
 
