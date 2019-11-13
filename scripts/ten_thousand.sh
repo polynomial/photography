@@ -42,12 +42,13 @@ for i in `seq 0 ${count}`; do
   fi
 done
 wait
-$echo mencoder "mf://IMG_*.JPG" -o IMG.avi -ovc lavc -lavcopts vcodec=mjpeg &
 $echo mencoder "mf://IMG_*.JPG" -o IMG.mpg -ovc copy -oac copy &
-$echo mencoder "mf://${prefix}_*" -o ${prefix}.avi -ovc lavc -lavcopts vcodec=mjpeg &
 $echo mencoder "mf://${prefix}_*" -o ${prefix}.mpg -ovc copy -oac copy &
-$echo mencoder "mf://${tprefix}_*" -o ${tprefix}.avi -ovc lavc -lavcopts vcodec=mjpeg &
 $echo mencoder "mf://${tprefix}_*" -o ${tprefix}.mpg -ovc copy -oac copy &
+wait
+$echo ffmpeg -i IMG.mpg -c:v libx264 -c:a libfaac -crf 15 -preset:v veryslow IMG.mp4
+$echo ffmpeg -i ${prefix}.mpg -c:v libx264 -c:a libfaac -crf 15 -preset:v veryslow ${prefix}.mp4
+$echo ffmpeg -i ${tprefix}.mpg -c:v libx264 -c:a libfaac -crf 15 -preset:v veryslow ${tprefix}.mp4
 
 
 wait
