@@ -89,16 +89,14 @@ for n in `seq 0 ${number_to_generate}`; do
   wait_for_load
 done
 wait
-$echo mencoder "mf://${tprefix}_*" -o ${tprefix}.avi -ovc lavc -lavcopts vcodec=mjpeg &
+$echo mencoder "mf://IMG_*.JPG" -o IMG_${prefix}.mpg -ovc copy -oac copy &
 $echo mencoder "mf://${tprefix}_*" -o ${tprefix}.mpg -ovc copy -oac copy &
-$echo mencoder "mf://IMG_*.JPG" -o IMG_${prefix}.avi -ovc lavc -lavcopts vcodec=mjpeg &
-#$echo mencoder "mf://IMG_*.JPG" -o IMG_${prefix}.mpg -ovc copy -oac copy &
-$echo mencoder "mf://${prefix}_*" -o ${prefix}.avi -ovc lavc -lavcopts vcodec=mjpeg &
 $echo mencoder "mf://${prefix}_*" -o ${prefix}.mpg -ovc copy -oac copy &
-#ffmpeg -i combined_1566777546.mpg -c:v libx264 -c:a libfaac -crf 20 -preset:v veryslow combined_1566777546.mp4
-# starting at IMG_1426
-# crf is the outstanding thing now 
-#ffmpeg -start_number 1426 -i IMG_%04d.JPG -c:v libx264 -crf 10-25? -preset:v veryslow IMG-test.mp4
+
+wait
+$echo ffmpeg -i IMG.mpg -c:v libx264 -c:a libfaac -crf 24 -preset:v veryslow IMG.mp4
+$echo ffmpeg -i ${prefix}.mpg -c:v libx264 -c:a libfaac -crf 15 -preset:v veryslow ${prefix}.mp4
+$echo ffmpeg -i ${tprefix}.mpg -c:v libx264 -c:a libfaac -crf 15 -preset:v veryslow ${tprefix}.mp4
 
 wait
 echo "done:"
