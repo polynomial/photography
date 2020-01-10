@@ -3,7 +3,7 @@
 umask 000
 echo=""
 set -x
-prefix="night_auto_iso"
+prefix="processed_$(date +%s)_"
 for b in `seq 0 9`; do
   for n in `seq 0 9`; do
     for y in `seq 0 9`; do
@@ -24,8 +24,8 @@ $echo cp $(\ls IMG_* | head -1) ${prefix}.jpg
 for i in ${prefix}_*; do
   $echo convert ${prefix}.jpg $i -gravity center -compose lighten -composite -format jpg ${prefix}.jpg
 done
-tprefix=trail_night
-source_prefix=night_auto_iso
+source_prefix=${prefix}
+tprefix=trail_${source_prefix}
 count=$(\ls -1 ${source_prefix}_* | grep -c .)
 for i in `seq 0 ${count}`; do
   file=$(seq -w $i ${count} | head -1)

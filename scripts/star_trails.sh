@@ -30,8 +30,8 @@ for a in `seq 0 9`; do
       for y in `seq 0 9`; do
         (
         echo $n $y
-        $echo cp $(\ls DSC${a}${b}${n}${y}* | head -1) ${prefix}_${a}_${b}_${n}_${y}.jpg 
-        for i in DSC${a}${b}${n}${y}* ; do
+        $echo cp $(\ls IMG_${a}${b}${n}${y}* | head -1) ${prefix}_${a}_${b}_${n}_${y}.jpg 
+        for i in IMG_${a}${b}${n}${y}* ; do
           echo $i
           $echo convert ${prefix}_${a}_${b}_${n}_${y}.jpg $i -gravity center -compose lighten -composite -format jpg ${prefix}_${a}_${b}_${n}_${y}.jpg 
         done
@@ -90,12 +90,12 @@ for n in `seq 0 ${number_to_generate}`; do
   wait_for_load
 done
 set -x
-$echo mencoder "mf://DSC*.JPG" -o DSC${prefix}.mpg -ovc copy -oac copy 
+$echo mencoder "mf://IMG_*.JPG" -o IMG_${prefix}.mpg -ovc copy -oac copy 
 $echo mencoder "mf://${tprefix}_*" -o ${tprefix}.mpg -ovc copy -oac copy 
 $echo mencoder "mf://${prefix}_*" -o ${prefix}.mpg -ovc copy -oac copy 
 
 #wait
-$echo ffmpeg -i DSC${prefix}.mpg -c:v libx264 -c:a libfaac -crf 24 -preset:v veryslow DSC${prefix}.mp4
+$echo ffmpeg -i IMG_${prefix}.mpg -c:v libx264 -c:a libfaac -crf 24 -preset:v veryslow IMG_${prefix}.mp4
 $echo ffmpeg -i ${prefix}.mpg -c:v libx264 -c:a libfaac -crf 15 -preset:v veryslow ${prefix}.mp4
 $echo ffmpeg -i ${tprefix}.mpg -c:v libx264 -c:a libfaac -crf 15 -preset:v veryslow ${tprefix}.mp4
 
