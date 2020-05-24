@@ -1,0 +1,2 @@
+#export LD_LIBRARY_PATH=/nix/store/p83sv8s88ba6sys2k90i7qd4a5m56f39-nvidia-x11-440.82-5.4.39/lib
+export LD_LIBRARY_PATH=/nix/store/avmhb3rkaw5xqsdww3i8w3fg7jry3dnh-nvidia-x11-440.82-5.4.41/lib

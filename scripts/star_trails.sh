@@ -23,18 +23,25 @@ function wait_for_load() {
   fi
 }
 
-prefix="combined_$(date +%s)"
+if [ -n "$1" ]; then
+  export DATE="$1"
+else
+  export DATE="$(date +%s)"
+fi
+prefix="combined_${DATE}"
 for a in `seq 0 9`; do
   for b in `seq 0 9`; do
     for n in `seq 0 9`; do
       for y in `seq 0 9`; do
         (
         echo $n $y
-        $echo cp $(\ls IMG_${a}${b}${n}${y}* | head -1) ${prefix}_${a}_${b}_${n}_${y}.jpg 
-        for i in IMG_${a}${b}${n}${y}* ; do
-          echo $i
-          $echo convert ${prefix}_${a}_${b}_${n}_${y}.jpg $i -gravity center -compose lighten -composite -format jpg ${prefix}_${a}_${b}_${n}_${y}.jpg 
-        done
+        if [ ! -f ${prefix}_${a}_${b}_${n}_${y}.jpg ]; then
+          $echo cp $(\ls IMG_${a}${b}${n}${y}* | head -1) ${prefix}_${a}_${b}_${n}_${y}.jpg 
+          for i in IMG_${a}${b}${n}${y}* ; do
+            echo $i
+            $echo convert ${prefix}_${a}_${b}_${n}_${y}.jpg $i -gravity center -compose lighten -composite -format jpg ${prefix}_${a}_${b}_${n}_${y}.jpg 
+          done
+        fi
         ) &
       done
       wait
@@ -61,7 +68,7 @@ for n in `seq 0 ${number_to_generate}`; do
   ) &
   wait_for_load
 done
-tprefix="trail_$(date +%s)"
+tprefix="trail_${DATE}"
 source_prefix="${prefix}"
 count=$(\ls -1 ${source_prefix}_* | grep -c .)
 length=10
