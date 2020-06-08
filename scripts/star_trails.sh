@@ -75,12 +75,14 @@ length=10
 for i in `seq 0 ${count}`; do
   file=$(seq -w $i ${count} | head -1)
   echo $i
-  (
-    $echo cp $(\ls ${source_prefix}_* | head -$(($length + $i)) | tail -$length | head -1) ${tprefix}_${file}.jpg
-    for img in $(\ls ${source_prefix}_* | head -$(($length + $i)) | tail -$length); do
-      $echo convert ${tprefix}_${file}.jpg $img -gravity center -compose lighten -composite -format jpg ${tprefix}_${file}.jpg
-    done
-  ) &
+  if [ ! -f "${tprefix}_${file}.jpg" ]; then
+    (
+      $echo cp $(\ls ${source_prefix}_* | head -$(($length + $i)) | tail -$length | head -1) ${tprefix}_${file}.jpg
+      for img in $(\ls ${source_prefix}_* | head -$(($length + $i)) | tail -$length); do
+        $echo convert ${tprefix}_${file}.jpg $img -gravity center -compose lighten -composite -format jpg ${tprefix}_${file}.jpg
+      done
+    ) &
+  fi
   wait_for_load
 done
 number_to_generate=20
