@@ -49,8 +49,8 @@ WHAT IT DOES:
   2. exports full-resolution JPEGs to DIR/export/
 
 EXAMPLES:
-  cd /Volumes/photos/some-shoot && autocrop-shoot
-  autocrop-shoot /Volumes/photos/some-shoot -q 92 -x 16
+  cd /path/to/shoot && autocrop-shoot
+  autocrop-shoot /path/to/shoot -q 92 -x 16
   autocrop-shoot . --crop-only -t my-look.CR3.xmp
 
 Requires: nix (provides the crop deps via the repo's .#autocrop shell) and
