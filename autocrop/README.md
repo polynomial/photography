@@ -10,6 +10,29 @@ Two tools for a large action/portrait shoot:
    parallel (many `darktable-cli` workers), far faster than darktable's built-in
    export dialog.
 
+## Quick start (one command)
+
+`autocrop-shoot` runs the whole pipeline — crop then export — with sensible
+defaults. Run it from inside a shoot, or pass a directory:
+
+```bash
+cd /path/to/shoot
+/path/to/photography/autocrop/autocrop-shoot          # processes the current dir
+# or
+autocrop-shoot /path/to/shoot -q 92 -x 16             # dir arg + overrides
+```
+
+Everything is overridable (`-w/--workers`, `-x/--export-workers`, `-q/--quality`,
+`-t/--template`, `--crop-only`, `--export-only`); see `autocrop-shoot --help`.
+Model weights and caches go under `~/.cache/photography-autocrop`, never into the
+shoot directory. Symlink it onto your `PATH` for `autocrop-shoot` from anywhere:
+
+```bash
+ln -s /path/to/photography/autocrop/autocrop-shoot /usr/local/bin/autocrop-shoot
+```
+
+The sections below document the underlying tools it calls.
+
 ## Requirements
 
 - [Nix](https://nixos.org) with flakes. The `autocrop` dev shell provides Python

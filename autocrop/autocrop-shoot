@@ -1,0 +1,109 @@
+#!/usr/bin/env bash
+#
+# autocrop-shoot — one command to auto-crop a shoot to the main in-focus person
+# and export full-quality JPEGs. Run it from inside a shoot directory (no args)
+# or pass a directory. Everything has a sensible default; override with flags.
+#
+set -euo pipefail
+
+# --- resolve this script's location (follow symlinks) so it works from anywhere
+src="${BASH_SOURCE[0]}"
+while [ -h "$src" ]; do
+  d="$(cd -P "$(dirname "$src")" && pwd)"; src="$(readlink "$src")"
+  [[ $src != /* ]] && src="$d/$src"
+done
+SCRIPT_DIR="$(cd -P "$(dirname "$src")" && pwd)"   # .../photography/autocrop
+REPO_ROOT="$(cd -P "$SCRIPT_DIR/.." && pwd)"        # .../photography
+
+# --- defaults (all overridable) ------------------------------------------------
+DIR=""
+WORKERS=8            # detection worker processes (crop step)
+EXPORT_WORKERS=24    # parallel darktable-cli processes (export step)
+QUALITY=100          # JPEG quality
+TEMPLATE=""          # darktable look .xmp ("" = bundled default-look.xmp)
+DO_CROP=1
+DO_EXPORT=1
+
+usage() {
+  cat <<EOF
+autocrop-shoot — crop a shoot to the main in-focus subject + export JPEGs
+
+USAGE:
+  autocrop-shoot [DIR] [options]
+
+  DIR                     shoot directory to process (default: current directory)
+
+OPTIONS:
+  -w, --workers N         detection workers for the crop step   (default: $WORKERS)
+  -x, --export-workers N  parallel export processes             (default: $EXPORT_WORKERS)
+  -q, --quality N         JPEG quality 1-100                     (default: $QUALITY)
+  -t, --template FILE     darktable look .xmp to apply
+                          (default: bundled default-look.xmp; pass '' for
+                           inject-into-existing-sidecar mode)
+      --crop-only         write crops, skip the JPEG export
+      --export-only       skip cropping, just (re)export existing sidecars
+  -h, --help              show this help
+
+WHAT IT DOES:
+  1. writes an adjustable darktable crop (+ the look) into each <name>.CR3.xmp
+  2. exports full-resolution JPEGs to DIR/export/
+
+EXAMPLES:
+  cd /Volumes/photos/some-shoot && autocrop-shoot
+  autocrop-shoot /Volumes/photos/some-shoot -q 92 -x 16
+  autocrop-shoot . --crop-only -t my-look.CR3.xmp
+
+Requires: nix (provides the crop deps via the repo's .#autocrop shell) and
+darktable (for export; found via \$DARKTABLE_CLI, PATH, or the macOS app).
+EOF
+}
+
+# --- parse args ----------------------------------------------------------------
+while [ $# -gt 0 ]; do
+  case "$1" in
+    -w|--workers)        WORKERS="$2"; shift 2 ;;
+    -x|--export-workers) EXPORT_WORKERS="$2"; shift 2 ;;
+    -q|--quality)        QUALITY="$2"; shift 2 ;;
+    -t|--template)       TEMPLATE="$2"; TEMPLATE_SET=1; shift 2 ;;
+    --crop-only)         DO_EXPORT=0; shift ;;
+    --export-only)       DO_CROP=0; shift ;;
+    -h|--help)           usage; exit 0 ;;
+    --) shift; break ;;
+    -*) echo "unknown option: $1" >&2; usage >&2; exit 2 ;;
+    *)  if [ -z "$DIR" ]; then DIR="$1"; shift; else echo "unexpected arg: $1" >&2; exit 2; fi ;;
+  esac
+done
+
+DIR="${DIR:-$PWD}"
+[ -d "$DIR" ] || { echo "not a directory: $DIR" >&2; exit 1; }
+DIR="$(cd "$DIR" && pwd)"   # absolutize
+
+# keep model weights + caches in a stable spot, never in the shoot directory
+CACHE="${XDG_CACHE_HOME:-$HOME/.cache}/photography-autocrop"
+mkdir -p "$CACHE"
+
+echo "==> shoot:   $DIR"
+echo "==> repo:    $REPO_ROOT"
+[ "$DO_CROP" = 1 ]   && echo "==> crop:    workers=$WORKERS template=${TEMPLATE:-<bundled>}"
+[ "$DO_EXPORT" = 1 ] && echo "==> export:  workers=$EXPORT_WORKERS quality=$QUALITY -> $DIR/export"
+echo
+
+if [ "$DO_CROP" = 1 ]; then
+  echo "==> [1/2] detecting subjects and writing crops..."
+  # cwd is $CACHE below, so the default 'yolo11m.pt' downloads/reuses there
+  crop_args=("$DIR" --workers "$WORKERS" --write)
+  # forward --template only when the user explicitly set one (incl. '' = inject mode)
+  if [ "${TEMPLATE_SET:-0}" = 1 ]; then crop_args+=(--template "$TEMPLATE"); fi
+  ( cd "$CACHE" && nix develop "$REPO_ROOT#autocrop" \
+      --extra-experimental-features "nix-command flakes" \
+      --command python "$SCRIPT_DIR/autocrop.py" "${crop_args[@]}" )
+fi
+
+if [ "$DO_EXPORT" = 1 ]; then
+  echo
+  echo "==> [2/2] exporting full-resolution JPEGs..."
+  bash "$SCRIPT_DIR/export_all.sh" "$DIR" "$EXPORT_WORKERS" "$QUALITY"
+fi
+
+echo
+echo "==> done."
