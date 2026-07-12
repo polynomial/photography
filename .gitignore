@@ -1,0 +1,8 @@
+# YOLO model weights (downloaded on first run) and ML framework caches
+*.pt
+.cache/
+# Python bytecode
+__pycache__/
+*.pyc
+# exported JPEGs (autocrop/export_all.sh writes these next to a shoot)
+export/

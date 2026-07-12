@@ -6,6 +6,10 @@ Tools:
 * Enfuse Enblend
 * Hugin
 
+See [`autocrop/`](autocrop/README.md) for a separate toolset that auto-crops a
+shoot to the main (in-focus) person via YOLO + darktable sidecars, and exports
+full-resolution JPEGs in parallel. Run `nix develop .#autocrop`.
+
 References:
 * https://patdavid.net/2013/01/focus-stacking-macro-photos-enfuse.html
 * https://patdavid.net/2013/05/noise-removal-in-photos-with-median_6.html
