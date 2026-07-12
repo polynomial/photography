@@ -27,15 +27,24 @@ nix develop .#autocrop
 
 ## 1. Generate crops (`autocrop.py`)
 
-The recommended workflow uses a **template**: edit *one* photo in darktable the
-way you want the whole set to look (your color grade + a crop), save its sidecar,
-and point `--template` at it. The tool copies only your *creative* modules
-(exposure, filmic, color balance, …) plus a fresh per-image crop, and lets
-darktable auto-apply the camera/shot-specific base (raw black/white point, white
-balance, input matrix, orientation) so mixed ISOs and camera bodies stay correct.
+The tool applies a darktable **template** look plus a fresh per-image crop. It
+copies only the template's *creative* modules (exposure, filmic, color balance,
+…) and lets darktable auto-apply the camera/shot-specific base (raw black/white
+point, white balance, input matrix, orientation) so mixed ISOs and camera bodies
+stay correct.
+
+A neutral default look ships as [`default-look.xmp`](default-look.xmp), so no
+template is required:
 
 ```bash
 # from the repo root, inside the shell (or via `nix develop .#autocrop --command`)
+python autocrop/autocrop.py /path/to/shoot --workers 8 --write
+```
+
+To use your own look, edit one photo in darktable exactly how you want the whole
+set to look (grade + a crop) and point `--template` at its sidecar:
+
+```bash
 python autocrop/autocrop.py /path/to/shoot \
   --template /path/to/shoot/A_GOOD_EDIT.CR3.xmp \
   --workers 8 --write
@@ -50,15 +59,15 @@ Key options:
 
 | flag | meaning |
 |------|---------|
-| `--template <xmp>` | clone this darktable edit's look onto every image (recommended) |
+| `--template <xmp>` | darktable look to clone onto every image (default: bundled `default-look.xmp`; pass `""` for inject-into-existing-sidecar mode) |
 | `--write` | write the sidecars (omit for a dry run) |
 | `--workers N` | parallel worker processes (CPU inference); ~8 is a good default |
 | `--proof-dir <dir>` | also render darktable JPEG proofs of the results (sequential) |
 | `--sample N` / `--limit N` | process an evenly-spread / first-N subset |
 | `--weights <file>` | YOLO weights (default `yolo11m.pt`) |
 
-Without `--template`, the crop is instead injected into each image's existing
-sidecar (`inject_crop`).
+With `--template ""`, no look is applied and the crop is instead injected into
+each image's existing sidecar (`inject_crop`).
 
 ### How the subject is chosen
 

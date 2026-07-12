@@ -26,6 +26,9 @@ from PIL import Image, ImageOps
 from dt_xmp import inject_crop, build_from_template
 
 EXIFTOOL = "exiftool"
+# bundled darktable "look" applied by default (creative modules + crop; the
+# camera/shot-specific base is auto-applied per image by darktable).
+DEFAULT_TEMPLATE = str(Path(__file__).resolve().parent / "default-look.xmp")
 CONF = 0.35          # min detection confidence for "person"
 CENTRALITY = 0.6     # how much to penalize off-center subjects (0=ignore, 1=strong)
 PERSON_CLASS = 0     # COCO class id for "person"
@@ -225,10 +228,12 @@ def main():
     ap.add_argument("--glob", default="*.CR3")
     ap.add_argument("--write", action="store_true",
                     help="write crop into the .xmp sidecars")
-    ap.add_argument("--template", default="",
+    ap.add_argument("--template", default=DEFAULT_TEMPLATE,
                     help="build each sidecar from this known-good darktable "
                          ".xmp (keeps its palette + adjustable crop), swapping "
-                         "in the per-image detected crop box")
+                         "in the per-image detected crop box. Defaults to the "
+                         "bundled default-look.xmp; pass \"\" to instead inject "
+                         "a crop into each image's existing sidecar.")
     ap.add_argument("--proof-dir", default="",
                     help="render darktable JPGs of results here")
     ap.add_argument("--workers", type=int, default=1,
@@ -258,9 +263,13 @@ def main():
     template_cr3 = None
     if args.template:
         tp = Path(args.template)
-        template_text = tp.read_text()
-        # the template's own image: "<name>.CR3.xmp" -> "<name>.CR3"
-        template_cr3 = tp.name[:-4] if tp.name.endswith(".xmp") else tp.name
+        if not tp.exists():
+            print(f"warning: template {tp} not found; falling back to "
+                  f"inject-into-existing-sidecar mode", flush=True)
+        else:
+            template_text = tp.read_text()
+            # the template's own image: "<name>.CR3.xmp" -> "<name>.CR3"
+            template_cr3 = tp.name[:-4] if tp.name.endswith(".xmp") else tp.name
 
     hits = misses = errors = skipped = 0
 
