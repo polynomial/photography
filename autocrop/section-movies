@@ -1,0 +1,153 @@
+#!/usr/bin/env bash
+#
+# section-movies — one command to turn a burst-shot stills shoot into
+# subject-tracked video clips, one per burst section. Run it from inside a shoot
+# directory (no args) or pass a directory. Everything has a sensible default.
+#
+# Each section gets ONE window size (so the frames can be encoded as video) slid
+# along a smoothed path of the subject, using the subject boxes autocrop already
+# wrote into the sidecars — plus realign.py's fixes from broken_fixed/ when that
+# directory exists.
+#
+set -euo pipefail
+
+# --- resolve this script's location (follow symlinks) so it works from anywhere
+src="${BASH_SOURCE[0]}"
+while [ -h "$src" ]; do
+  d="$(cd -P "$(dirname "$src")" && pwd)"; src="$(readlink "$src")"
+  [[ $src != /* ]] && src="$d/$src"
+done
+SCRIPT_DIR="$(cd -P "$(dirname "$src")" && pwd)"   # .../photography/autocrop
+REPO_ROOT="$(cd -P "$SCRIPT_DIR/.." && pwd)"        # .../photography
+
+# --- defaults (all overridable) ------------------------------------------------
+DIR=""
+OUT_DIR="movies"     # subdirectory of the shoot the clips land in
+WIDTH=1080           # portrait 9:16, fills a phone screen held upright
+HEIGHT=1920
+SPEED=0.25           # playback speed vs capture rate (0.25 = quarter speed)
+FPS=30               # frame rate of the encoded files
+PAD=1.6              # window size as a multiple of the subject box
+GAP=2.0              # seconds between frames that starts a new section
+MIN_FRAMES=8         # skip sections shorter than this
+SMOOTH=9             # frames of moving average on the subject path
+CRF=20               # H.264 quality, lower is better
+WORKERS=12           # parallel darktable-cli renders
+SECTIONS=""          # "" = all
+COMBINED=0           # off: no all_sections.mp4 unless asked for
+LIST=0
+KEEP_FRAMES=0
+REFRESH=0
+
+usage() {
+  cat <<EOF
+section-movies — subject-tracked video clips, one per burst section
+
+USAGE:
+  section-movies [DIR] [options]
+
+  DIR                     shoot directory to process (default: current directory)
+
+OPTIONS:
+  -o, --out-dir NAME      output subdirectory                 (default: $OUT_DIR)
+  -W, --width N           output width                        (default: $WIDTH)
+  -H, --height N          output height                       (default: $HEIGHT)
+  -s, --speed F           playback speed vs capture rate      (default: $SPEED)
+  -f, --fps N             frame rate of the encoded files     (default: $FPS)
+  -p, --pad F             window size vs the subject box      (default: $PAD)
+  -g, --gap S             gap in seconds that splits sections (default: $GAP)
+  -m, --min-frames N      skip sections shorter than this     (default: $MIN_FRAMES)
+      --smooth N          frames of smoothing on the path     (default: $SMOOTH)
+      --crf N             H.264 quality, lower is better      (default: $CRF)
+  -w, --workers N         parallel darktable renders          (default: $WORKERS)
+  -n, --sections LIST     build only these, e.g. '0,3,7-9'    (default: all)
+  -l, --list              print the section breakdown and exit
+  -c, --combined          also write all_sections.mp4 (every clip end to end)
+      --keep-frames       keep the rendered JPEGs
+      --refresh           re-read frame metadata instead of using the cache
+  -h, --help              show this help
+
+WHAT IT DOES:
+  1. groups the shoot into sections — bursts, split on a gap in capture time
+  2. per section, derives one fixed window from the subject boxes and slides it
+     along a smoothed path of the subject's centre
+  3. renders each frame through darktable with that window as its crop
+  4. encodes each section to an H.264 MP4 that plays anywhere, Android included
+
+  Clips land in DIR/$OUT_DIR/ as section_NN_<first>-<last>.mp4, alongside
+  sections.json describing each one. Run --list first to see the sections.
+
+EXAMPLES:
+  cd /path/to/shoot && section-movies
+  section-movies /path/to/shoot --list
+  section-movies /path/to/shoot -n 7 -p 1.2        # one section, tighter framing
+  section-movies /path/to/shoot -s 1.0 -c          # real time + combined movie
+
+Requires: nix (provides python, exiftool and ffmpeg via the repo's .#autocrop
+shell) and darktable (found via \$DARKTABLE_CLI, PATH, or the macOS app).
+EOF
+}
+
+# --- parse args ----------------------------------------------------------------
+while [ $# -gt 0 ]; do
+  case "$1" in
+    -o|--out-dir)     OUT_DIR="$2"; shift 2 ;;
+    -W|--width)       WIDTH="$2"; shift 2 ;;
+    -H|--height)      HEIGHT="$2"; shift 2 ;;
+    -s|--speed)       SPEED="$2"; shift 2 ;;
+    -f|--fps)         FPS="$2"; shift 2 ;;
+    -p|--pad)         PAD="$2"; shift 2 ;;
+    -g|--gap)         GAP="$2"; shift 2 ;;
+    -m|--min-frames)  MIN_FRAMES="$2"; shift 2 ;;
+    --smooth)         SMOOTH="$2"; shift 2 ;;
+    --crf)            CRF="$2"; shift 2 ;;
+    -w|--workers)     WORKERS="$2"; shift 2 ;;
+    -n|--sections)    SECTIONS="$2"; shift 2 ;;
+    -l|--list)        LIST=1; shift ;;
+    -c|--combined)    COMBINED=1; shift ;;
+    --keep-frames)    KEEP_FRAMES=1; shift ;;
+    --refresh)        REFRESH=1; shift ;;
+    -h|--help)        usage; exit 0 ;;
+    --) shift; break ;;
+    -*) echo "unknown option: $1" >&2; usage >&2; exit 2 ;;
+    *)  if [ -z "$DIR" ]; then DIR="$1"; shift; else echo "unexpected arg: $1" >&2; exit 2; fi ;;
+  esac
+done
+
+DIR="${DIR:-$PWD}"
+[ -d "$DIR" ] || { echo "not a directory: $DIR" >&2; exit 1; }
+DIR="$(cd "$DIR" && pwd)"   # absolutize
+
+# keep tool caches in a stable spot, never in the shoot or the repo
+CACHE="${XDG_CACHE_HOME:-$HOME/.cache}/photography-autocrop"
+mkdir -p "$CACHE"
+
+args=("$DIR"
+      --out-dir "$OUT_DIR"
+      --width "$WIDTH" --height "$HEIGHT"
+      --speed "$SPEED" --fps "$FPS"
+      --pad "$PAD" --smooth "$SMOOTH" --crf "$CRF"
+      --gap "$GAP" --min-frames "$MIN_FRAMES"
+      --workers "$WORKERS")
+[ -n "$SECTIONS" ]      && args+=(--sections "$SECTIONS")
+[ "$LIST" = 1 ]         && args+=(--list)
+[ "$COMBINED" = 1 ]     || args+=(--no-concat)
+[ "$KEEP_FRAMES" = 1 ]  && args+=(--keep-frames)
+[ "$REFRESH" = 1 ]      && args+=(--refresh)
+
+if [ "$LIST" != 1 ]; then
+  echo "==> shoot:   $DIR"
+  echo "==> output:  $DIR/$OUT_DIR  (${WIDTH}x${HEIGHT}, ${SPEED}x speed, ${FPS}fps)"
+  echo "==> framing: pad=$PAD smooth=$SMOOTH sections=${SECTIONS:-all} workers=$WORKERS"
+  [ "$COMBINED" = 1 ] && echo "==> also writing all_sections.mp4"
+  echo
+fi
+
+( cd "$CACHE" && nix develop "$REPO_ROOT#autocrop" \
+    --extra-experimental-features "nix-command flakes" \
+    --command python "$SCRIPT_DIR/section_movie.py" "${args[@]}" )
+
+if [ "$LIST" != 1 ]; then
+  echo
+  echo "==> done."
+fi

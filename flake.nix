@@ -60,7 +60,9 @@
           # Subject auto-crop + parallel export tools (autocrop/).
           # Enter with:  nix develop .#autocrop
           autocrop = acPkgs.mkShell {
-            buildInputs = [ acPython acPkgs.exiftool acPkgs.coreutils ];
+            # ffmpeg: encodes the subject-tracked section clips (section_movie.py)
+            buildInputs = [ acPython acPkgs.exiftool acPkgs.coreutils
+                            acPkgs.ffmpeg ];
             shellHook = ''
               # keep model weights + caches out of the way and writable
               export YOLO_CONFIG_DIR="''${YOLO_CONFIG_DIR:-$PWD/.cache/ultralytics}"
